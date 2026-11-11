@@ -1,0 +1,75 @@
+PLAN DE PRUEBAS / VALIDACIÓN — HelpDesk (MF0227_3)
+====================================================
+
+Entorno: Python 3.12, Django 5.2, SQLite. Fecha de ejecución: 11/11/2026.
+Resultado global: todos los casos SUPERADOS.
+
+----------------------------------------------------------------------
+CP-01 · Transición correcta de estados en POO (UF2404)
+----------------------------------------------------------------------
+Objetivo:   Comprobar que TicketTecnico solo admite transiciones lógicas.
+Pasos:      1. Ejecutar: python core_modelos.py
+            2. Crear TicketHardware(1, "Pantalla no enciende", "Monitor", "Alta").
+            3. iniciar() -> cerrar() -> iniciar().
+Esperado:   Abierto -> En Proceso -> Cerrado son válidas.
+            Cerrado -> En Proceso lanza EstadoInvalidoError y el estado
+            sigue siendo "Cerrado". reabrir() devuelve el ticket a "Abierto".
+Obtenido:   "Capturada: Transición no permitida: 'Cerrado' -> 'En Proceso'."
+            Resultado: 11/11 comprobaciones superadas.
+Estado:     SUPERADO
+
+----------------------------------------------------------------------
+CP-02 · Polimorfismo de calcular_sla() (UF2404)
+----------------------------------------------------------------------
+Objetivo:   Verificar que cada tipo de ticket calcula su propio SLA.
+Pasos:      Ejecutar python core_modelos.py y revisar el bloque 1.
+Esperado:   TicketHardware Alta = 24 h; TicketSoftware Alta = 8 h;
+            TicketSoftware Media en Windows XP = 36 h (24 h + 50 %).
+            Una prioridad inexistente lanza PrioridadInvalidaError.
+Obtenido:   Valores esperados; "Urgentísima" lanza PrioridadInvalidaError.
+Estado:     SUPERADO
+
+----------------------------------------------------------------------
+CP-03 · Validación de campos vacíos en el formulario web (UF2405)
+----------------------------------------------------------------------
+Objetivo:   El formulario no debe registrar incidencias incompletas.
+Pasos:      1. python manage.py runserver
+            2. Ir a http://127.0.0.1:8000/nueva/
+            3. Pulsar "Registrar incidencia" con Título y Descripción vacíos.
+Esperado:   La página se vuelve a mostrar (HTTP 200) con el mensaje
+            "Este campo es obligatorio." bajo cada campo y no se crea
+            ningún registro.
+Obtenido:   HTTP 200, errores mostrados, 0 incidencias creadas.
+            (Automatizado: IncidenciaFormTests.test_campos_vacios_no_validan
+            e IncidenciaViewTests.test_post_invalido_no_crea_y_muestra_errores)
+Estado:     SUPERADO
+
+----------------------------------------------------------------------
+CP-04 · Alta correcta de una incidencia desde la web (UF2405)
+----------------------------------------------------------------------
+Objetivo:   Registrar una incidencia válida y verla en la lista.
+Pasos:      1. En /nueva/ rellenar Título "Portatil no arranca",
+               Descripción "No enciende el LED", Prioridad "Crítica".
+            2. Enviar el formulario.
+Esperado:   Redirección (HTTP 302) a la lista, mensaje "registrada
+            correctamente", estado inicial "Abierto" y la incidencia
+            aparece en la tabla.
+Obtenido:   HTTP 302 -> /, la incidencia aparece en la lista.
+Estado:     SUPERADO
+
+----------------------------------------------------------------------
+CP-05 · Panel de administración (UF2405)
+----------------------------------------------------------------------
+Objetivo:   Gestionar los modelos desde /admin/.
+Pasos:      1. python manage.py createsuperuser e iniciar sesión en /admin/.
+            2. Abrir Incidencias, filtrar por Estado y buscar por el
+               nombre de un técnico.
+Esperado:   La lista muestra id, título, estado, prioridad, técnico y
+            fecha; el filtro y el buscador reducen los resultados.
+Obtenido:   /admin/ responde HTTP 200; filtros y búsqueda operativos.
+Estado:     SUPERADO
+
+----------------------------------------------------------------------
+Pruebas automáticas
+----------------------------------------------------------------------
+python manage.py test incidencias  ->  Ran 9 tests ... OK
