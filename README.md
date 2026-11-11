@@ -54,8 +54,18 @@ python manage.py test incidencias # Bloque 2: pruebas automáticas de Django
 
 | Variable | Uso | Valor por defecto |
 |----------|-----|-------------------|
-| `DJANGO_SECRET_KEY` | Clave secreta de Django | Clave de desarrollo |
+| `DJANGO_SECRET_KEY` | Clave secreta de Django | Si no se define y `DEBUG` está activo, se genera una aleatoria en cada arranque. Con `DEBUG=0` es obligatoria |
 | `DJANGO_DEBUG` | `1` activa el modo depuración, `0` lo desactiva | `1` |
+
+El repositorio no contiene ningún secreto: ni la clave de Django, ni la base de
+datos (`db.sqlite3`), ni usuarios o contraseñas. Cada persona crea su propia base
+de datos con `migrate` y su propio administrador con `createsuperuser`.
+
+Para generar una clave propia:
+
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
 
 ## Estructura del proyecto
 
