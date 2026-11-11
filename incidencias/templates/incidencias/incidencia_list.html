@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Incidencias{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h3 mb-0">Incidencias</h1>
+  <a class="btn btn-primary" href="{% url 'incidencias:nueva' %}">+ Nueva incidencia</a>
+</div>
+
+<div class="btn-group btn-group-sm mb-3" role="group" aria-label="Filtrar por estado">
+  <a class="btn btn-outline-secondary {% if not estado_actual %}active{% endif %}" href="?">Todas</a>
+  {% for valor, etiqueta in estados %}
+    <a class="btn btn-outline-secondary {% if estado_actual == valor %}active{% endif %}" href="?estado={{ valor }}">{{ etiqueta }}</a>
+  {% endfor %}
+</div>
+
+{% if incidencias %}
+<div class="table-responsive">
+  <table class="table table-hover align-middle bg-white shadow-sm">
+    <thead class="table-light">
+      <tr>
+        <th>#</th>
+        <th>Título</th>
+        <th>Estado</th>
+        <th>Prioridad</th>
+        <th>Técnico</th>
+        <th>Creada</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for incidencia in incidencias %}
+      <tr>
+        <td>{{ incidencia.pk }}</td>
+        <td>
+          <strong>{{ incidencia.titulo }}</strong>
+          <div class="text-secondary small">{{ incidencia.descripcion|truncatechars:80 }}</div>
+        </td>
+        <td>
+          <span class="badge {% if incidencia.estado == 'ABIERTO' %}text-bg-info{% elif incidencia.estado == 'EN_PROCESO' %}text-bg-warning{% else %}text-bg-secondary{% endif %}">
+            {{ incidencia.get_estado_display }}
+          </span>
+        </td>
+        <td>
+          <span class="badge {% if incidencia.prioridad == 'CRITICA' %}text-bg-danger{% elif incidencia.prioridad == 'ALTA' %}text-bg-warning{% else %}text-bg-light border{% endif %}">
+            {{ incidencia.get_prioridad_display }}
+          </span>
+        </td>
+        <td>{{ incidencia.tecnico.nombre|default:"Sin asignar" }}</td>
+        <td class="text-nowrap">{{ incidencia.fecha_creacion|date:"d/m/Y H:i" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Paginación">
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if estado_actual %}&estado={{ estado_actual }}{% endif %}">Anterior</a></li>
+    {% endif %}
+    <li class="page-item disabled"><span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+    {% if page_obj.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if estado_actual %}&estado={{ estado_actual }}{% endif %}">Siguiente</a></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="alert alert-light border">
+  No hay incidencias registradas. <a href="{% url 'incidencias:nueva' %}">Registra la primera</a>.
+</div>
+{% endif %}
+{% endblock %}

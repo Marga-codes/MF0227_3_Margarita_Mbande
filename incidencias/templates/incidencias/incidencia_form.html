@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva incidencia{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <h1 class="h3 mb-3">Nueva incidencia</h1>
+
+    <form method="post" class="card card-body shadow-sm" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label" for="{{ field.id_for_label }}">
+            {{ field.label|capfirst }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}
+          </label>
+          {{ field }}
+          {% for error in field.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Registrar incidencia</button>
+        <a href="{% url 'incidencias:lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
